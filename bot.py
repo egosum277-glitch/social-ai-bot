@@ -1,20 +1,12 @@
-async def normal_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_text = update.message.text
+def main():
+    app = ApplicationBuilder().token(TOKEN).build()
 
-    msg = await update.message.reply_text("Думаю... 🧠")
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, normal_message))
 
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "Ти корисний AI-асистент. Відповідай українською просто і коротко."},
-                {"role": "user", "content": user_text}
-            ],
-            timeout=20
-        )
+    print("Бот запущений...")
+    app.run_polling()
 
-        answer = response.choices[0].message.content
-        await msg.edit_text(answer)
 
-    except Exception as e:
-        await msg.edit_text(f"Помилка AI ⚠️\n\n{str(e)}")
+if __name__ == "__main__":
+    main()
