@@ -1,32 +1,36 @@
 import os
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
+import telebot
+from openai import OpenAI
 
-# Отримуємо токен зі змінних середовища (БЕЗПЕКА!)
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+# Отримуємо токени зі змінних середовища Railway
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Я працюю 24/7 🚀")
+bot = telebot.TeleBot(BOT_TOKEN)
+client = OpenAI(api_key=OPENAI_API_KEY)
 
-async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("✅ Система активна\n✅ AI-модуль підключено")
+@bot.message_handler(commands=['start', 'help'])
+def send_welcome(message):
+    bot.reply_to(message, "Я на зв'язку. Що цікавить?")
 
-async def main():
-    # Перевірка чи є токен
-    if not TOKEN:
-        print("Помилка: TELEGRAM_TOKEN не знайдено в зміних оточення!")
-        return
-
-    app = ApplicationBuilder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("status", status)) # Тепер це працюватиме
-    
-    print("Бот запускається...")
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
+    try:
+        # Відправляємо запит до ChatGPT
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo", # Можеш змінити на gpt-4o, якщо апік дозволяє
+            messages=[
+                {"role": "system", "content": "Ти розумний і лаконічний асистент."},
+                {"role": "user", "content": message.text}
+            ]
+        )
+        
+        answer = response.choices[0].message.content
+        bot.reply_to(message, answer)
+        
+    except Exception as e:
+        print(f"Помилка: {e}")
+        bot.reply_to(message, "Тут якась халепа з мізками (OpenAI). Перевір баланс або ключ.")
 
 if __name__ == "__main__":
-    import asyncio
-    asyncio.run(main())
+    bot.polling(none_stop=True)
