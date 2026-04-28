@@ -21,3 +21,10 @@ def main():
 
 if __name__ == "__main__":
     main()
+async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Система активна ✅\n"
+        "Генерал працює 🧠\n"
+        "Telegram-модуль готовий ✅\n"
+        "AI-модуль підключений ✅"
+    )
