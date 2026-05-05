@@ -7,19 +7,19 @@ from openai import OpenAI
 
 load_dotenv()
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+TELEGRAM_TOKEN = os.getenv("BOT_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL = os.getenv("MODEL", "gpt-5.2")
 
 
 def test_env():
-    assert BOT_TOKEN, "BOT_TOKEN відсутній"
+    assert TELEGRAM_TOKEN, "TELEGRAM_TOKEN відсутній"
     assert OPENAI_API_KEY, "OPENAI_API_KEY відсутній"
     print("ENV OK")
 
 
 def test_telegram():
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getMe"
+    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getMe"
 
     with urllib.request.urlopen(url, timeout=15) as response:
         data = json.loads(response.read().decode("utf-8"))
