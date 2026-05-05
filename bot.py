@@ -15,7 +15,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MODEL = os.getenv("MODEL", "gpt-5.2")
 SYSTEM_PROMPT = os.getenv(
@@ -24,13 +24,13 @@ SYSTEM_PROMPT = os.getenv(
     "Відповідай мовою користувача. Якщо питання складне — пояснюй структуровано."
 )
 
-if not BOT_TOKEN:
-    raise RuntimeError("Немає BOT_TOKEN. Додай його в Railway Variables або .env")
+if not TELEGRAM_TOKEN:
+    raise RuntimeError("Немає TELEGRAM_TOKEN. Додай його в Railway Variables або .env")
 
 if not OPENAI_API_KEY:
     raise RuntimeError("Немає OPENAI_API_KEY. Додай його в Railway Variables або .env")
 
-bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None)
+bot = telebot.TeleBot(TELEGRAM_TOKEN, parse_mode=None)
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 # Проста памʼять діалогу в RAM.
